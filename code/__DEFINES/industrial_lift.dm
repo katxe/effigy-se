@@ -36,3 +36,10 @@
 #define DESTINATION_EAST_IDLE "east_idle"
 #define DESTINATION_NOT_IN_SERVICE "NIS"
 #define DESTINATION_OFF "off"
+
+// ICTS goes here
+/// ICTS Tram lines
+#define TRAMSTATION_LINE_1 "tram_1"
+#define HILBERT_LINE_1 "hilb_1"
+#define BIRDSHOT_LINE_1 "bird_1"
+#define BIRDSHOT_LINE_2 "bird_1"

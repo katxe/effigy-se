@@ -48,6 +48,7 @@ GLOBAL_LIST_EMPTY(tram_doors)
 /obj/machinery/computer/tram_controls/ui_state(mob/user)
 	return GLOB.not_incapacitated_state
 
+/*
 /obj/machinery/computer/tram_controls/ui_status(mob/user,/datum/tgui/ui)
 	var/datum/lift_master/tram/tram = tram_ref?.resolve()
 
@@ -56,6 +57,7 @@ GLOBAL_LIST_EMPTY(tram_doors)
 	if(!in_range(user, src) && !isobserver(user))
 		return UI_CLOSE
 	return ..()
+*/
 
 /obj/machinery/computer/tram_controls/ui_interact(mob/user, datum/tgui/ui)
 	. = ..()

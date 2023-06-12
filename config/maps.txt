@@ -52,3 +52,6 @@ endmap
 
 map effigy_liquids
 endmap
+
+map tramstation_icts
+endmap
