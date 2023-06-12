@@ -13,10 +13,10 @@ GLOBAL_LIST_EMPTY(tram_landmarks)
 
 /obj/effect/landmark/tram/Initialize(mapload)
 	. = ..()
-	LAZYADDASSOCLIST(GLOB.tram_landmarks, specific_lift_id, src)
+	LAZYADDASSOCLIST(SSicts_transport.nav_beacons, specific_lift_id, src)
 
 /obj/effect/landmark/tram/Destroy()
-	LAZYREMOVEASSOC(GLOB.tram_landmarks, specific_lift_id, src)
+	LAZYREMOVEASSOC(SSicts_transport.nav_beacons, specific_lift_id, src)
 	return ..()
 
 //tramstation

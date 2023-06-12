@@ -14,9 +14,9 @@
 	light_range = 0 //we dont want to spam SSlighting with source updates every movement
 
 	///Weakref to the tram piece we control
-	var/datum/weakref/tram_ref
+	var/datum/weakref/module_ref
 
-	var/specific_lift_id = MAIN_STATION_TRAM
+	var/specific_transport_id = TRAMSTATION_LINE_1
 
 /obj/machinery/computer/icts_controls/Initialize(mapload, obj/item/circuitboard/C)
 	. = ..()
@@ -27,9 +27,9 @@
 	. = ..()
 	find_tram()
 
-	var/datum/lift_master/tram/tram_part = tram_ref?.resolve()
-	if(tram_part)
-		RegisterSignal(tram_part, COMSIG_TRAM_SET_TRAVELLING, PROC_REF(update_tram_display))
+	var/datum/transport_controller/linear/tram/icts_controller = module_ref?.resolve()
+	if(icts_controller)
+		RegisterSignal(icts_controller, COMSIG_TRAM_SET_TRAVELLING, PROC_REF(update_tram_display))
 
 /**
  * Finds the tram from the console
@@ -37,15 +37,15 @@
  * Locates tram parts in the lift global list after everything is done.
  */
 /obj/machinery/computer/icts_controls/proc/find_tram()
-	for(var/datum/lift_master/lift as anything in GLOB.active_lifts_by_type[TRAM_LIFT_ID])
-		if(lift.specific_lift_id == specific_lift_id)
-			tram_ref = WEAKREF(lift)
+	for(var/datum/transport_controller/linear/transport as anything in SSicts_transport.transports_by_type[TRAM_LIFT_ID])
+		if(transport.specific_transport_id == specific_transport_id)
+			module_ref = WEAKREF(transport)
 
 /obj/machinery/computer/icts_controls/ui_state(mob/user)
 	return GLOB.not_incapacitated_state
 
 /obj/machinery/computer/icts_controls/ui_status(mob/user,/datum/tgui/ui)
-	var/datum/lift_master/tram/tram = tram_ref?.resolve()
+	var/datum/transport_controller/linear/tram/tram = module_ref?.resolve()
 
 	if(tram?.travelling)
 		return UI_CLOSE
@@ -61,11 +61,11 @@
 		ui.open()
 
 /obj/machinery/computer/icts_controls/ui_data(mob/user)
-	var/datum/lift_master/tram/tram_lift = tram_ref?.resolve()
+	var/datum/transport_controller/linear/tram/tram_controller = module_ref?.resolve()
 	var/list/data = list()
-	data["moving"] = tram_lift?.travelling
-	data["broken"] = tram_lift ? FALSE : TRUE
-	var/obj/effect/landmark/tram/current_loc = tram_lift?.idle_platform
+	data["moving"] = tram_controller?.travelling
+	data["broken"] = tram_controller ? FALSE : TRUE
+	var/obj/effect/landmark/icts/nav_beacon/tram/current_loc = tram_controller?.idle_platform
 	if(current_loc)
 		data["tram_location"] = current_loc.name
 	return data
@@ -84,7 +84,7 @@
  */
 /obj/machinery/computer/icts_controls/proc/get_destinations()
 	. = list()
-	for(var/obj/effect/landmark/tram/destination as anything in GLOB.tram_landmarks[specific_lift_id])
+	for(var/obj/effect/landmark/icts/nav_beacon/tram/destination as anything in SSicts_transport.nav_beacons[specific_transport_id])
 		var/list/this_destination = list()
 		this_destination["name"] = destination.name
 		this_destination["dest_icons"] = destination.tgui_icons
@@ -98,8 +98,8 @@
 
 	switch (action)
 		if ("send")
-			var/obj/effect/landmark/tram/destination_platform
-			for (var/obj/effect/landmark/tram/destination as anything in GLOB.tram_landmarks[specific_lift_id])
+			var/obj/effect/landmark/icts/nav_beacon/tram/destination_platform
+			for (var/obj/effect/landmark/icts/nav_beacon/tram/destination as anything in SSicts_transport.nav_beacons[specific_transport_id])
 				if(destination.platform_code == params["destination"])
 					destination_platform = destination
 					break
@@ -110,33 +110,33 @@
 			return try_send_tram(destination_platform)
 
 /// Attempts to sends the tram to the given destination
-/obj/machinery/computer/icts_controls/proc/try_send_tram(obj/effect/landmark/tram/destination_platform)
-	var/datum/lift_master/tram/tram_part = tram_ref?.resolve()
-	if(!tram_part)
+/obj/machinery/computer/icts_controls/proc/try_send_tram(obj/effect/landmark/icts/nav_beacon/tram/destination_platform)
+	var/datum/transport_controller/linear/tram/icts_controller = module_ref?.resolve()
+	if(!icts_controller)
 		return FALSE
-	if(tram_part.controls_locked || tram_part.travelling) // someone else started already
+	if(icts_controller.controls_locked || icts_controller.travelling) // someone else started already
 		return FALSE
-	tram_part.tram_travel(destination_platform)
+	icts_controller.tram_travel(destination_platform)
 	say("The next station is: [destination_platform.name]")
 	update_appearance()
 	return TRUE
 
-/obj/machinery/computer/icts_controls/proc/update_tram_display(obj/effect/landmark/tram/idle_platform, travelling)
+/obj/machinery/computer/icts_controls/proc/update_tram_display(obj/effect/landmark/icts/nav_beacon/tram/idle_platform, travelling)
 	SIGNAL_HANDLER
-	var/datum/lift_master/tram/tram_part = tram_ref?.resolve()
+	var/datum/transport_controller/linear/tram/icts_controller = module_ref?.resolve()
 	if(travelling)
-		icon_screen = "[base_icon_state][tram_part.idle_platform.name]_active"
+		icon_screen = "[base_icon_state][icts_controller.idle_platform.name]_active"
 	else
-		icon_screen = "[base_icon_state][tram_part.idle_platform.name]_idle"
+		icon_screen = "[base_icon_state][icts_controller.idle_platform.name]_idle"
 	update_appearance(UPDATE_ICON)
 	return PROCESS_KILL
 
 /obj/machinery/computer/icts_controls/power_change() // Change tram operating status on power loss/recovery
 	. = ..()
-	var/datum/lift_master/tram/tram_part = tram_ref?.resolve()
+	var/datum/transport_controller/linear/tram/icts_controller = module_ref?.resolve()
 	update_operating()
-	if(tram_part)
-		if(!tram_part.travelling)
+	if(icts_controller)
+		if(!icts_controller.travelling)
 			if(is_operational)
 				for(var/obj/machinery/crossing_signal/xing as anything in GLOB.tram_signals)
 					xing.set_signal_state(XING_STATE_MALF, TRUE)
@@ -151,9 +151,10 @@
 					desto.update_appearance()
 
 /obj/machinery/computer/icts_controls/proc/update_operating() // Pass the operating status from the controls to the lift_master
-	var/datum/lift_master/tram/tram_part = tram_ref?.resolve()
-	if(tram_part)
+	var/datum/transport_controller/linear/tram/icts_controller = module_ref?.resolve()
+	if(icts_controller)
 		if(machine_stat & NOPOWER)
-			tram_part.is_operational = FALSE
+			icts_controller.controller_operational = FALSE
 		else
-			tram_part.is_operational = TRUE
+			icts_controller.controller_operational = TRUE
+obj/effect/landmark/icts/nav_beacon/tram

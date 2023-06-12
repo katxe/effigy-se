@@ -3637,6 +3637,7 @@
 #include "code\modules\icts_tram\icts_controller_linear.dm"
 #include "code\modules\icts_tram\icts_controller_tram.dm"
 #include "code\modules\icts_tram\icts_controls.dm"
+#include "code\modules\icts_tram\icts_doors.dm"
 #include "code\modules\icts_tram\icts_module.dm"
 #include "code\modules\icts_tram\icts_navigation.dm"
 #include "code\modules\industrial_lift\industrial_lift.dm"

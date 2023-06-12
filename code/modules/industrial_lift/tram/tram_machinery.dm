@@ -90,7 +90,7 @@ GLOBAL_LIST_EMPTY(tram_doors)
  */
 /obj/machinery/computer/tram_controls/proc/get_destinations()
 	. = list()
-	for(var/obj/effect/landmark/tram/destination as anything in GLOB.tram_landmarks[specific_lift_id])
+	for(var/obj/effect/landmark/tram/destination as anything in SSicts_transport.nav_beacons[specific_lift_id])
 		var/list/this_destination = list()
 		this_destination["name"] = destination.name
 		this_destination["dest_icons"] = destination.tgui_icons
@@ -105,7 +105,7 @@ GLOBAL_LIST_EMPTY(tram_doors)
 	switch (action)
 		if ("send")
 			var/obj/effect/landmark/tram/destination_platform
-			for (var/obj/effect/landmark/tram/destination as anything in GLOB.tram_landmarks[specific_lift_id])
+			for (var/obj/effect/landmark/tram/destination as anything in SSicts_transport.nav_beacons[specific_lift_id])
 				if(destination.platform_code == params["destination"])
 					destination_platform = destination
 					break
@@ -214,7 +214,7 @@ GLOBAL_LIST_EMPTY(tram_doors)
 		return
 
 	var/destination
-	for(var/obj/effect/landmark/tram/possible_destination as anything in GLOB.tram_landmarks[computer.specific_lift_id])
+	for(var/obj/effect/landmark/tram/possible_destination as anything in SSicts_transport.nav_beacons[computer.specific_lift_id])
 		if(possible_destination.name == new_destination.value)
 			destination = possible_destination
 			break

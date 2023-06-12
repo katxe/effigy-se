@@ -114,7 +114,7 @@
 	if(platform == tram_part.idle_platform.platform_code)
 		balloon_alert(user, "invalid command!")
 		return FALSE
-	for (var/obj/effect/landmark/tram/destination as anything in GLOB.tram_landmarks[tram_id])
+	for (var/obj/effect/landmark/tram/destination as anything in SSicts_transport.nav_beacons[tram_id])
 		if(destination.platform_code == platform)
 			destination_platform = destination
 			break
